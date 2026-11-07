@@ -1,0 +1,13 @@
+{
+  "name": "smartpaypesa-stk-service",
+  "version": "1.0.0",
+  "description": "Express server to dispatch SmartPayPesa STK push requests",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "dotenv": "^16.4.5",
+    "express": "^4.19.2"
+  }
+}
