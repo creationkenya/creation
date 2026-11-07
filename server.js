@@ -2,14 +2,29 @@ require('dotenv').config();
 const express = require('express');
 
 const app = express();
+
+// --- NATIVE CORS WORKAROUND (No npm install required) ---
+app.use((req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*'); // Allows requests from your GitHub Pages frontend
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, Accept');
+  
+  // Handle preflight OPTIONS requests immediately
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+  next();
+});
+// ---------------------------------------------------------
+
 app.use(express.json());
 
-// Health check route for Render
+// Health check route for Render & UptimeRobot
 app.get('/health', (req, res) => {
   res.status(200).json({ status: 'ok' });
 });
 
-// Endpoint matching your frontend fetch call
+// STK Push Endpoint matching your frontend
 app.post('/api/stkpush', async (req, res) => {
   try {
     const { phone, amount, smartcard } = req.body;
@@ -18,7 +33,7 @@ app.post('/api/stkpush', async (req, res) => {
       return res.status(400).json({ error: 'Missing required parameters: phone, amount, or smartcard' });
     }
 
-    // Convert local format (07... / 01...) to international format (254...) required by the gateway
+    // Convert local format (07... / 01...) to international format (254...) required by SmartPayPesa
     let formattedPhone = String(phone).trim();
     if (formattedPhone.startsWith('0')) {
       formattedPhone = '254' + formattedPhone.slice(1);
